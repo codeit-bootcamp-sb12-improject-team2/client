@@ -1,21 +1,16 @@
 import { Outlet } from "react-router";
 import { PrivateHeader } from "@/shared/components/gnb";
-import Footer from "@/shared/components/Footer";
 
 export default function PrivateLayout() {
   return (
-    <div className="min-h-dvh flex flex-col gap-[60px]">
-      <div className="sticky top-0 z-30">
-        <PrivateHeader />
-      </div>
+    <div className="min-h-dvh text-slate-900">
+      {/* 공통 헤더 */}
+      <PrivateHeader />
 
-      <div className="flex-1 overflow-x-auto">
-        <main className="flex-1 min-w-[1280px] px-4">
-          <Outlet />
-        </main>
-      </div>
-
-      <Footer />
+      {/* 페이지별 콘텐츠 영역 */}
+      <main className="px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+        <Outlet />
+      </main>
     </div>
   );
 }

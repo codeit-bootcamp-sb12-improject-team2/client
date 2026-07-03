@@ -29,10 +29,10 @@ export default function HeaderTabButton({
       to={TAB_TO_PATH[variant]}
       className={({ isActive }) =>
         [
-          "inline-flex items-center gap-2 rounded-lg px-4 py-2 md:text-16-sb text-14-sb transition",
+          "relative inline-flex items-center px-1 py-4 text-16-sb tracking-tight transition-colors after:absolute after:left-1/2 after:-translate-x-1/2 after:-bottom-[1px] after:h-[3px] after:w-12 after:rounded-full after:transition-all",
           isActive
-            ? "bg-cyan-100 text-cyan-700"
-            : "bg-transparent text-gray-900 hover:bg-gray-100",
+            ? "text-slate-950 after:bg-slate-950"
+            : "text-slate-500 hover:text-slate-900 after:bg-transparent",
           className ?? "",
         ].join(" ")
       }
