@@ -1,24 +1,29 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cyan-100: #e0f7fa;
-  --color-cyan-200: #b2ebf2;
-  --color-cyan-300: #80deea;
-  --color-cyan-400: #4dd0e1;
-  --color-cyan-500: #00bcd4;
-  --color-cyan-600: #009eb1;
+  /* 포인트 색상: 소프트 올리브 / 딥 와인 */
+  --color-cyan-50: #f6f1e5;
+  --color-cyan-100: #ebe1cd;
+  --color-cyan-200: #d4c8a9;
+  --color-cyan-300: #b9a979;
+  --color-cyan-400: #96854f;
+  --color-cyan-500: #605331;
+  --color-cyan-600: #60211a;
+  --color-cyan-700: #471714;
 
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #989fac;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
+  /* 본문/텍스트 색상 */
+  --color-gray-50: #ffffff;
+  --color-gray-100: #f8fafc;
+  --color-gray-200: #e2e8f0;
+  --color-gray-300: #cbd5e1;
+  --color-gray-400: #94a3b8;
+  --color-gray-500: #64748b;
+  --color-gray-600: #475569;
+  --color-gray-700: #334155;
+  --color-gray-800: #1e293b;
+  --color-gray-900: #0f172a;
 
-  --color-orange: #ff7648;
-  --color-error: #f04438;
+  /* 버튼/포인트 색상 */
+  --color-orange: #f97316;
+  --color-error: #ef4444;
 }
