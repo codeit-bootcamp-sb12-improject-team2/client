@@ -3,7 +3,8 @@ name: Deploy Front-end to Amazon S3 & CloudFront
 on:
   push:
     branches:
-      - main  # main 브랜치에 push될 때 배포 실행
+      - main
+      - dev  # 테스트 및 개발 진행을 위해 dev 브랜치에서도 배포 실행
 
 jobs:
   deploy:

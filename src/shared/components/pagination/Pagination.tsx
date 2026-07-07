@@ -80,7 +80,7 @@ export default function Pagination({
             <button
               key={page}
               type="button"
-              onClick={() => onPageChange(page)}
+              onClick={() => onPageChange(page as number)}
               aria-current={page === currentPage ? "page" : undefined}
               className={`inline-flex h-10 min-w-10 items-center justify-center px-2 transition-colors ${
                 page === currentPage
