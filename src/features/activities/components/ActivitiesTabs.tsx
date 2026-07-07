@@ -24,8 +24,9 @@ export default function ActivitiesTabs() {
   const active = useActiveTab();
 
   return (
-    <nav aria-label="활동내역 탭" className="w-[895px] min-h-[66px]">
-      <div className="grid grid-cols-3 gap-2 rounded-lg bg-gray-100 p-2">
+    <nav aria-label="활동내역 탭" className="min-h-[66px] w-full min-w-0">
+      {/* 활동내역 탭을 랭킹 패널의 전환 버튼 톤으로 통일 */}
+      <div className="grid grid-cols-3 gap-2 rounded-xl bg-[#f3efe8] p-1">
         {ACTIVITIES_TABS.map((tab) => {
           const isActive = active === tab;
           return (
@@ -34,11 +35,11 @@ export default function ActivitiesTabs() {
               to={activitiesPath(tab)}
               aria-current={isActive ? "page" : undefined}
               className={[
-                "inline-flex justify-center w-full rounded-lg py-3 transition",
-                "text-16-m",
+                "inline-flex w-full justify-center rounded-lg px-3 py-2 transition",
+                "text-13-b",
                 isActive
-                  ? "bg-white text-black text-16-sb"
-                  : "text-gray-500 hover:bg-gray-200",
+                  ? "bg-white text-[#60211a] shadow-sm"
+                  : "text-gray-500 hover:text-slate-800",
               ].join(" ")}
             >
               {LABEL[tab]}

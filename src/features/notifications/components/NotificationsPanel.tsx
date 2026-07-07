@@ -67,7 +67,7 @@ export default function NotificationsPanel({
   return (
     <aside
       className="fixed top-0 right-0 flex flex-col overflow-hidden items-center
-      p-7 w-full max-w-[438px] h-dvh rounded-l-2xl bg-gray-100"
+      p-7 w-full max-w-[438px] h-dvh rounded-l-2xl bg-[#fbfaf6]"
       role="dialog"
       aria-label="알림"
     >
@@ -80,7 +80,7 @@ export default function NotificationsPanel({
           </button>
         </div>
 
-        <div className="mt-7 mb-6 h-[1px] w-full bg-gray-300" />
+        <div className="mt-7 mb-6 h-[1px] w-full bg-[#e8e2d8]" />
 
         {/* Summary */}
         <div className="flex items-baseline justify-between w-full px-2 mb-2.5">
