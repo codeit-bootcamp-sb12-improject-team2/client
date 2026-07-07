@@ -637,7 +637,6 @@ export default function ArticlesPage() {
 
   const handlePageJump = async (targetIndex: number) => {
     if (targetIndex === pageIndex || isLoading) return;
-    if (targetIndex > pageHistory.length) return;
 
     const cachedPage = pageHistory[targetIndex];
     if (cachedPage) {
