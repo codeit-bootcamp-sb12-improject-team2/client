@@ -14,17 +14,14 @@ export default function Pagination({
   if (totalPages <= 1) return null;
 
   const pageNumbers =
-    totalPages <= 11
+    totalPages <= 7
       ? Array.from({ length: totalPages }, (_, i) => i + 1)
-      : currentPage <= 5
-        ? [1, 2, 3, 4, 5, 6, 7, 8, "ellipsis", totalPages]
-        : currentPage >= totalPages - 4
+      : currentPage <= 4
+        ? [1, 2, 3, 4, 5, "ellipsis", totalPages]
+        : currentPage >= totalPages - 3
           ? [
               1,
               "ellipsis",
-              totalPages - 7,
-              totalPages - 6,
-              totalPages - 5,
               totalPages - 4,
               totalPages - 3,
               totalPages - 2,
@@ -34,11 +31,9 @@ export default function Pagination({
           : [
               1,
               "ellipsis",
-              currentPage - 2,
               currentPage - 1,
               currentPage,
               currentPage + 1,
-              currentPage + 2,
               "ellipsis",
               totalPages,
             ];

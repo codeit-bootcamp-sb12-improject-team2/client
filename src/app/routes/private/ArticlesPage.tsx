@@ -213,22 +213,18 @@ export default function ArticlesPage() {
 
   const buildPaginationItems = useCallback(
     (currentPage: number, pageCount: number) => {
-      // 페이지 링크는 최대 11개만 보여주고 가운데 구간은 말줄임표
-      if (pageCount <= 11) {
+      if (pageCount <= 7) {
         return Array.from({ length: pageCount }, (_, index) => index + 1);
       }
 
-      if (currentPage <= 5) {
-        return [1, 2, 3, 4, 5, 6, 7, 8, "ellipsis", pageCount];
+      if (currentPage <= 4) {
+        return [1, 2, 3, 4, 5, "ellipsis", pageCount];
       }
 
-      if (currentPage >= pageCount - 4) {
+      if (currentPage >= pageCount - 3) {
         return [
           1,
           "ellipsis",
-          pageCount - 7,
-          pageCount - 6,
-          pageCount - 5,
           pageCount - 4,
           pageCount - 3,
           pageCount - 2,
@@ -240,11 +236,9 @@ export default function ArticlesPage() {
       return [
         1,
         "ellipsis",
-        currentPage - 2,
         currentPage - 1,
         currentPage,
         currentPage + 1,
-        currentPage + 2,
         "ellipsis",
         pageCount,
       ];
@@ -643,6 +637,7 @@ export default function ArticlesPage() {
 
   const handlePageJump = async (targetIndex: number) => {
     if (targetIndex === pageIndex || isLoading) return;
+    if (targetIndex > pageHistory.length) return;
 
     const cachedPage = pageHistory[targetIndex];
     if (cachedPage) {
@@ -691,9 +686,14 @@ export default function ArticlesPage() {
     }
   };
 
+  const reachablePageCount = Math.min(
+    totalPages,
+    pageHistory.length + (hasNext ? 1 : 0),
+  );
+
   const paginationItems = useMemo(
-    () => buildPaginationItems(pageIndex + 1, totalPages),
-    [buildPaginationItems, pageIndex, totalPages],
+    () => buildPaginationItems(pageIndex + 1, reachablePageCount),
+    [buildPaginationItems, pageIndex, reachablePageCount],
   );
 
   const rankingDisplayItems = useMemo(() => {

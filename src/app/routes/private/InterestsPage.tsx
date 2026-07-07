@@ -120,9 +120,9 @@ export default function InterestsPage() {
           return updated;
         });
 
-        // We only know the exact total once there's no next page;
-        // until then, show at least one page beyond the current one if hasNext.
-        setTotalPages(response.hasNext ? page + 1 : page);
+        setTotalPages(
+          Math.max(1, Math.ceil(response.totalElements / PAGE_SIZE)),
+        );
       } catch (error) {
         console.error("API 에러:", error);
       } finally {
