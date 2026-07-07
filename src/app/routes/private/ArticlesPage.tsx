@@ -255,8 +255,8 @@ export default function ArticlesPage() {
   const fetchInterestData = useCallback(async () => {
     try {
       const response = await getUserActivities(userId);
-
-      const userInterests = response.subscriptions.map((sub) => ({
+      const subscriptions = response?.subscriptions || [];
+      const userInterests = subscriptions.map((sub) => ({
         id: sub.interestId,
         name: sub.interestName,
         keywords: sub.interestKeywords,
@@ -267,7 +267,7 @@ export default function ArticlesPage() {
     } catch (error) {
       console.error(error);
     }
-  }, []);
+  }, [userId]);
 
   const fetchArticleSources = useCallback(async () => {
     try {
@@ -290,8 +290,8 @@ export default function ArticlesPage() {
     try {
       // 조회수/댓글수 랭킹은 같은 API에서 타입만 바꿔 가져옴
       const response = await getArticleRanking(type);
-      setRankingItems(response.articles);
-      setRankingDate(response.date);
+      setRankingItems(response?.articles || []);
+      setRankingDate(response?.date || "");
     } catch (error) {
       console.error(error);
     }
@@ -306,7 +306,7 @@ export default function ArticlesPage() {
   }, [fetchDailyRankings, rankingType]);
 
   const interestNames = useMemo(
-    () => interests.map((interest) => interest.name),
+    () => (interests || []).map((interest) => interest.name),
     [interests],
   );
 
@@ -697,11 +697,13 @@ export default function ArticlesPage() {
   );
 
   const rankingDisplayItems = useMemo(() => {
-    if (rankingItems.length > 0) {
-      return rankingItems;
+    const safeRankingItems = rankingItems || [];
+    if (safeRankingItems.length > 0) {
+      return safeRankingItems;
     }
 
-    return [...articles]
+    const safeArticles = articles || [];
+    return [...safeArticles]
       .sort((a, b) =>
         rankingType === "VIEW"
           ? b.viewCount - a.viewCount
