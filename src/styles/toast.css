@@ -16,6 +16,10 @@
   font-weight: 500;
 }
 
+.Toastify__toast-body {
+  color: white;
+}
+
 :root {
   --toastify-icon-color-success: #47cd89;
   --toastify-icon-color-error: #ff6257;
