@@ -1,0 +1,54 @@
+name: Deploy Front-end to Amazon S3 & CloudFront
+
+on:
+  push:
+    branches:
+      - main  # main 브랜치에 push될 때 배포 실행
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 소스 코드 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Node.js 버전 설정 (package.json의 사양 등에 맞춰 최신 LTS 권장)
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      # 3. 의존성 패키지 설치
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. React 애플리케이션 빌드
+      # Vite는 빌드 시점에 환경변수(VITE_*)를 코드에 주입하므로 Secrets로부터 환경변수를 넘겨줍니다.
+      - name: Build Application
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+        run: npm run build
+
+      # 5. AWS 자격 증명 설정 (GitHub Secrets에 등록된 IAM 계정 정보 사용)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2  # 리전 (서울)
+
+      # 6. S3 버킷에 빌드 산출물(dist/) 동기화 및 이전 파일 제거
+      - name: Upload to S3
+        run: |
+          aws s3 sync dist/ s3://${{ secrets.AWS_S3_BUCKET_NAME }} --delete
+
+      # 7. CloudFront 캐시 무효화 (선택사항: CloudFront 사용 시 새 파일이 즉시 반영되도록 함)
+      - name: CloudFront Cache Invalidation
+        if: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID != '' }}
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
