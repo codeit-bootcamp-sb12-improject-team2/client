@@ -49,6 +49,9 @@ jobs:
 
       # 7. CloudFront 캐시 무효화 (선택사항: CloudFront 사용 시 새 파일이 즉시 반영되도록 함)
       - name: CloudFront Cache Invalidation
-        if: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID != '' }}
+        env:
+          DISTRIBUTION_ID: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+        if: env.DISTRIBUTION_ID != ''
         run: |
           aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+
