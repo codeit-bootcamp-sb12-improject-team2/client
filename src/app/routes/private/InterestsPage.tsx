@@ -1,9 +1,10 @@
 import Button from "@/shared/components/button/Button";
 import plusIcon from "@/assets/icons/plus.svg";
 import SearchBar from "@/shared/components/SearchBar";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import SelectBox from "@/shared/components/SelectBox";
 import InterestCard from "@/features/interests/components/InterestCard";
+import Pagination from "@/shared/components/pagination/Pagination";
 import { useAuthInfo } from "@/features/auth/hooks/useAuthInfo";
 import {
   addInterest,
@@ -38,6 +39,8 @@ interface ApiErrorResponse {
   status?: number;
 }
 
+const PAGE_SIZE = 9;
+
 export default function InterestsPage() {
   const [interests, setInterests] = useState<InterestListItem[]>([]);
 
@@ -47,12 +50,13 @@ export default function InterestsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [hasNext, setHasNext] = useState(false);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [nextAfter, setNextAfter] = useState<string | null>(null);
 
-  const observerRef = useRef<IntersectionObserver>(null);
-  const lastElementRef = useRef<HTMLDivElement>(null);
+  const [cursorStack, setCursorStack] = useState<
+    { cursor: string | null; after: string | null }[]
+  >([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const keyword = searchParams.get("keyword") || "";
   const orderByParam = searchParams.get("orderBy");
@@ -70,107 +74,75 @@ export default function InterestsPage() {
   const [sortBy, setSortBy] = useState("이름");
   const [sortOrder, setSortOrder] = useState("내림차순");
 
-  const limit = searchParams.get("limit") || "6";
-
   const { userId } = useAuthInfo();
 
   const { isOpen, openModal, onClose } = useUpdateModal();
 
-  const fetchInitialData = useCallback(async () => {
-    if (!userId) {
-      return;
-    }
+  const fetchPage = useCallback(
+    async (
+      page: number,
+      stack: { cursor: string | null; after: string | null }[],
+    ) => {
+      if (!userId) return;
 
-    setIsLoading(true);
+      setIsLoading(true);
 
-    try {
-      const params = {
-        keyword,
-        orderBy,
-        direction,
-        limit: parseInt(limit),
-      };
-      const response = await getInterests(params, userId);
-      setInterests(response.content);
-      setHasNext(response.hasNext);
-      setNextCursor(response.nextCursor);
-      setNextAfter(response.nextAfter);
-    } catch (error) {
-      console.error("API 에러:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [keyword, orderBy, direction, limit, userId]);
+      try {
+        const cursorForPage = page > 1 ? stack[page - 2] : undefined;
 
-  const fetchMoreData = useCallback(async () => {
-    if (!userId || !hasNext || isLoading) return;
+        const params = {
+          keyword,
+          orderBy,
+          direction,
+          size: PAGE_SIZE,
+          cursor: cursorForPage?.cursor || undefined,
+          after: cursorForPage?.after || undefined,
+        };
 
-    setIsLoading(true);
-    try {
-      const params = {
-        keyword,
-        orderBy,
-        direction,
-        limit: parseInt(limit),
-        cursor: nextCursor || undefined,
-        after: nextAfter || undefined,
-      };
+        const response = await getInterests(params, userId);
+        console.log(
+          "API returned:",
+          response.content.length,
+          "items, size was:",
+          params.size,
+        );
+        setInterests(response.content);
+        setCurrentPage(page);
 
-      const response = await getInterests(params, userId);
-      setInterests((prev) => [...prev, ...response.content]);
-      setHasNext(response.hasNext);
-      setNextCursor(response.nextCursor);
-      setNextAfter(response.nextAfter);
-    } catch (error) {
-      console.error("API 에러:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [
-    keyword,
-    orderBy,
-    direction,
-    limit,
-    userId,
-    hasNext,
-    isLoading,
-    nextCursor,
-    nextAfter,
-  ]);
+        setCursorStack((prev) => {
+          const updated = [...prev];
+          if (response.hasNext) {
+            updated[page - 1] = {
+              cursor: response.nextCursor,
+              after: response.nextAfter,
+            };
+          }
+          return updated;
+        });
 
-  useEffect(() => {
-    if (isLoading) return;
-
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-    }
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNext) {
-          fetchMoreData();
-        }
-      },
-      {
-        threshold: 0,
-        rootMargin: "0px 0px 200px 0px",
-      },
-    );
-
-    if (lastElementRef.current) {
-      observerRef.current.observe(lastElementRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) observerRef.current.disconnect();
-    };
-  }, [hasNext, isLoading, fetchMoreData]);
+        // We only know the exact total once there's no next page;
+        // until then, show at least one page beyond the current one if hasNext.
+        setTotalPages(response.hasNext ? page + 1 : page);
+      } catch (error) {
+        console.error("API 에러:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [keyword, orderBy, direction, userId],
+  );
 
   useEffect(() => {
     setSortBy(orderBy === "name" ? "이름" : "구독자수");
     setSortOrder(direction === "DESC" ? "내림차순" : "오름차순");
-    fetchInitialData();
-  }, [fetchInitialData, orderBy, direction]);
+    setCursorStack([]);
+    fetchPage(1, []);
+  }, [keyword, orderBy, direction, userId]);
+
+  const handlePageChange = (page: number) => {
+    if (page === currentPage) return;
+    fetchPage(page, cursorStack);
+  };
 
   const handleSubScribeClick = async (
     interestId: InterestId,
@@ -199,7 +171,6 @@ export default function InterestsPage() {
       );
     } catch (error) {
       console.error(error);
-
       toast.error(currentSubscribed ? "구독 취소 실패" : "구독 실패");
     }
   };
@@ -207,21 +178,17 @@ export default function InterestsPage() {
   const handleAddInterest = async (data: AddInterestBody) => {
     try {
       await addInterest(data);
-
-      fetchInitialData();
-
+      setCursorStack([]);
+      fetchPage(1, []);
       onClose();
     } catch (error) {
       console.error(error);
       if (error && typeof error === "object" && "response" in error) {
-        console.error(error);
-
         const axiosError = error as AxiosError<ApiErrorResponse>;
         const errorMessage =
           axiosError.response?.data?.message ||
           axiosError.message ||
           "오류가 발생했습니다.";
-
         toast.error(errorMessage);
       }
     }
@@ -234,14 +201,9 @@ export default function InterestsPage() {
     if (!userId) return;
 
     try {
-      const updateBody: UpdateInterestBody = {
-        keywords: keywords,
-      };
-
+      const updateBody: UpdateInterestBody = { keywords };
       await updateInterest(interestId, updateBody);
-
-      await fetchInitialData();
-
+      await fetchPage(currentPage, cursorStack);
       toast.success("키워드 수정 성공");
     } catch (error) {
       console.error(error);
@@ -252,8 +214,8 @@ export default function InterestsPage() {
   const handleDeleteInterest = async (interestId: InterestId) => {
     try {
       await deleteInterest(interestId);
-
-      await fetchInitialData();
+      setCursorStack([]);
+      await fetchPage(1, []);
     } catch (error) {
       console.error(error);
       toast.error("관심 목록 제거 실패");
@@ -275,7 +237,6 @@ export default function InterestsPage() {
 
   const handleSortOptions = (value: string) => {
     const newSort = value === "이름" ? "name" : "subscriberCount";
-
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
       newParams.set("orderBy", newSort);
@@ -285,7 +246,6 @@ export default function InterestsPage() {
 
   const handleOrderOptions = (value: string) => {
     const newOrder = value === "오름차순" ? "ASC" : "DESC";
-
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
       newParams.set("direction", newOrder);
@@ -295,16 +255,16 @@ export default function InterestsPage() {
 
   return (
     <div>
-      <div className="w-[1200px] mx-auto">
+      <div className="w-[1100px] mx-auto">
         <div className="flex justify-between items-center">
-          <div className="text-left">
+          <div className="text-left ml-15">
             <h1 className="text-24-b text-gray-900">관심사 목록</h1>
             <p className="text-16-m text-gray-500 mt-3">
               구독 중인 관심사를 관리하고, 새로운 관심사를 등록해보세요.
             </p>
           </div>
           <Button
-            className="min-w-[186px] flex justify-center items-center"
+            className="min-w-[150px] flex justify-center items-center mr-12"
             onClick={openModal}
           >
             <img src={plusIcon} className="w-5 h-5" alt="추가" />
@@ -318,12 +278,12 @@ export default function InterestsPage() {
           />
         </div>
         <div className="flex justify-between items-center mt-10">
-          <div className="flex justify-center items-center gap-3 ">
+          <div className="flex justify-center items-center gap-2">
             <SelectBox
               items={sortOptions}
               value={sortBy}
               onChange={handleSortOptions}
-              className="w-24 h-10"
+              className="w-17 h-10 ml-14"
             />
             <SelectBox
               items={orderOptions}
@@ -332,10 +292,13 @@ export default function InterestsPage() {
               className="w-24 h-10"
             />
           </div>
-          <SearchBar width="w-[304px]" onSearch={handleSearch} />
+          <SearchBar
+            width="w-[250px] flex justify-center items-center mr-11.5"
+            onSearch={handleSearch}
+          />
         </div>
-        <div className="mt-4 min-w-2xs">
-          {interests.length === 0 ? (
+        <div className="mt-8 min-w-2xs">
+          {interests.length === 0 && !isLoading ? (
             <div className="flex justify-center items-center min-h-[200px] mt-30">
               {keyword ? (
                 <EmptyState message="검색 결과가 없습니다." />
@@ -344,26 +307,31 @@ export default function InterestsPage() {
               )}
             </div>
           ) : (
-            <div className="mt-4 grid grid-cols-3 gap-4">
-              {interests.map((interest, index) => (
-                <div
-                  className="w-[386px] h-[232px]"
-                  key={interest.id}
-                  ref={index === interests.length - 1 ? lastElementRef : null}
-                >
-                  <InterestCard
-                    interestId={interest.id}
-                    name={interest.name}
-                    keywords={interest.keywords}
-                    subscriberCount={interest.subscriberCount}
-                    isSubscribed={interest.subscribedByMe}
-                    onSubscribeClick={handleSubScribeClick}
-                    onSaveKeyword={handleSaveKeyword}
-                    onDeleteInterest={handleDeleteInterest}
-                  />
-                </div>
-              ))}
-            </div>
+            <>
+              <div className="mx-14 grid grid-cols-3 gap-6">
+                {interests.map((interest) => (
+                  <div className="w-full h-[320px]" key={interest.id}>
+                    <InterestCard
+                      interestId={interest.id}
+                      name={interest.name}
+                      keywords={interest.keywords}
+                      subscriberCount={interest.subscriberCount}
+                      isSubscribed={interest.subscribedByMe}
+                      onSubscribeClick={handleSubScribeClick}
+                      onSaveKeyword={handleSaveKeyword}
+                      onDeleteInterest={handleDeleteInterest}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                className="mt-10"
+              />
+            </>
           )}
 
           {isLoading && <Skeleton className="h-[232px] mx-4" />}

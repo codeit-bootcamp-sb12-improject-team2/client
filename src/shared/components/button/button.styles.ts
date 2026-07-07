@@ -11,12 +11,15 @@ const baseStyles = `inline-flex items-center justify-center gap-2.5
   transition select-none focus:outline-none
   disabled:bg-gray-200 disabled:text-gray-600 disabled:border-none`;
 
-const primaryStyles = `bg-cyan-500 text-white
-  hover:bg-cyan-600`;
+// 버튼 색상: 기본/주요 액션
+const primaryStyles = `bg-[#60211a] text-white
+  hover:bg-[#4e1c15]`;
 
-const secondaryStyles = `bg-white border border-cyan-500 text-cyan-500
-  hover:border-cyan-600 hover:text-cyan-600`;
+// 버튼 색상: 보조 액션
+const secondaryStyles = `bg-white border border-[#60211a] text-[#60211a]
+  hover:border-[#4e1c15] hover:text-[#4e1c15]`;
 
+// 버튼 색상: 비활성/중립 액션
 const tertiaryStyles = `bg-white border border-gray-400 text-gray-400
   hover:border-gray-600 hover:text-gray-600`;
 

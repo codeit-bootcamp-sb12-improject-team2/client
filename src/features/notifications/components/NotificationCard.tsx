@@ -18,7 +18,7 @@ export default function NotificationCard({
   return (
     <article
       className="flex items-center justify-between
-      w-full min-h-[80px] bg-white border border-gray-200 rounded-xl p-4 gap-2.5"
+      w-full min-h-[80px] bg-[#fcfbf7] border border-[#e8e2d8] rounded-xl p-4 gap-2.5"
       role="listitem"
     >
       <div className="flex items-start w-full">

@@ -29,7 +29,13 @@ export default function CommentHistoryCard({
     <div className="w-full max-w-[895px] h-auto px-2 py-8 bg-transparent border-none">
       <div className="flex mb-4 items-center">
         <div className="flex">
-          <p className="text-16-m text-cyan-600">{articleTitle}</p>
+          <p
+            className={`text-16-m ${
+              mode === "liked" ? "text-[#60211a]" : "text-gray-900"
+            }`}
+          >
+            {articleTitle}
+          </p>
           <span className="text-16-r">
             {mode === "recent" ? "에 남긴 댓글" : "에 좋아요한 댓글"}
           </span>

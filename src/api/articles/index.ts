@@ -38,6 +38,17 @@ export async function getArticle(
   return data;
 }
 
+/* 뉴스 기사 AI 요약 조회 */
+export async function getArticleSummary(
+  articleId: ArticleId,
+): Promise<T.GetArticleSummaryResponse> {
+  //  AI 요약은 articleId만 보내고 summary/keywords만...
+  const { data } = await http.get<T.GetArticleSummaryResponse>("/ai/summary", {
+    params: { articleId },
+  });
+  return data;
+}
+
 /* 출처 목록 조회 */
 export async function getArticleSource(): Promise<T.ArticleSource[]> {
   const { data } = await http.get<T.ArticleSource[]>("/articles/sources");

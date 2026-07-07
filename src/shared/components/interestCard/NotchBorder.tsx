@@ -1,0 +1,32 @@
+export default function NotchBorder({
+  className = "",
+}: {
+  className?: string;
+}) {
+  return (
+    <svg
+      viewBox="0 0 300 350"
+      preserveAspectRatio="none"
+      className={`pointer-events-none absolute inset-0 h-full w-full ${className}`}
+    >
+      <path
+        d="M 24,4
+           H 276
+           Q 296,4 296,24
+           V 140
+           A 20,20 0 0 0 296,180
+           V 326
+           Q 296,346 276,346
+           H 24
+           Q 4,346 4,326
+           V 24
+           Q 4,4 24,4
+           Z"
+        fill="white"
+        stroke="#e7e0d8"
+        strokeWidth="1.5"
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
+  );
+}
