@@ -21,6 +21,7 @@ import type { SortDirection } from "@/types/direction";
 import { format } from "date-fns";
 import Label from "@/shared/components/Label";
 import commentIcon from "@/assets/icons/comment.svg";
+import aiSummaryIcon from "@/assets/icons/ai-summary.svg";
 import useConfirmModal from "@/shared/hooks/useConfirmModal";
 import ConfirmModal from "@/shared/components/modal/ConfirmModal";
 import { addArticleView, getArticle, getArticleSummary } from "@/api/articles";
@@ -350,11 +351,11 @@ export default function ArticleDetailModal({
               </div>
             </div>
           </div>
-          <div className="mb-6 flex items-center gap-2">
+          <div className="mb-6 flex items-center gap-1.5">
             <Button
               size="sm"
               className="w-[162px]"
-              variant="secondary"
+              variant="primary"
               onClick={handleClick}
             >
               전체 기사 보러가기 →
@@ -362,13 +363,12 @@ export default function ArticleDetailModal({
             <button
               type="button"
               onClick={handleAiSummaryClick}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-cyan-600 transition hover:border-cyan-300 hover:bg-cyan-50"
+              className="inline-flex h-10 items-center justify-center gap-0.5 rounded-full border border-[#60211a] bg-white px-2 text-14-m text-[#60211a] transition hover:bg-[#fffdf8]"
               aria-label="AI 요약"
               title="AI 요약"
             >
-              <span aria-hidden="true" className="text-[18px] leading-none">
-                ✦
-              </span>
+              <img src={aiSummaryIcon} className="h-8 w-8" alt="" />
+              <span>요약하기</span>
             </button>
           </div>
 
