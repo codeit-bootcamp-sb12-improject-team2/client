@@ -71,7 +71,7 @@ export default function CheckboxList({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 z-10">
+        <div className="absolute top-full left-0 right-0 z-50">
           <div className="absolute box-border bg-white border border-gray-200 rounded-lg overflow-hidden w-full">
             <ul className="py-1 max-h-60 overflow-y-auto">
               {items.map((item) => (

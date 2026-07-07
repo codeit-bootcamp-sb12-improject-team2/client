@@ -71,3 +71,9 @@ export type RestoreArticlesResponse = {
   restoredArticleIds: ArticleId[];
   restoredArticleCount: number;
 };
+
+/* 기사 AI 요약 */
+export type GetArticleSummaryResponse = {
+  summary: string;
+  keywords: string[];
+};
