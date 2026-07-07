@@ -72,15 +72,15 @@ export default function SelectBox({
         </div>
       </button>
 
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 z-10">
-          <Dropdown
-            items={items}
-            onChange={handleItemSelect}
-            className="w-full"
-          />
-        </div>
-      )}
+     {isOpen && (
+  <div className="absolute top-full left-0 right-0 z-50">
+    <Dropdown
+      items={items}
+      onChange={handleItemSelect}
+      className="w-full"
+    />
+  </div>
+)}
     </div>
   );
 }

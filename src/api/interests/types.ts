@@ -19,7 +19,7 @@ export type GetInterestsParams = {
   direction: SortDirection;
   cursor?: string;
   after?: string;
-  limit: number;
+  size: number;
 };
 
 /* 관심사 목록 조회 - 응답 */
