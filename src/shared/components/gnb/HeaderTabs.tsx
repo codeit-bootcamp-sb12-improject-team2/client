@@ -4,7 +4,7 @@ export default function HeaderTabs() {
   return (
     <nav
       aria-label="GNB tabs"
-      className="flex items-center justify-center gap-12 overflow-x-auto border-b border-slate-200 py-0 sm:gap-16"
+      className="mx-auto flex max-w-[1500px] items-center justify-center gap-10 overflow-x-auto px-4 py-2 sm:gap-14 sm:px-6 lg:px-8"
     >
       <HeaderTabButton variant="articles" />
       <HeaderTabButton variant="interests" />

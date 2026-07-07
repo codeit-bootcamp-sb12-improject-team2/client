@@ -1,8 +1,13 @@
-export default function NotchBorder({ className = "" }: { className?: string }) {
+export default function NotchBorder({
+  className = "",
+}: {
+  className?: string;
+}) {
   return (
     <svg
       viewBox="0 0 300 350"
-      className={`absolute inset-0 w-full h-full pointer-events-none mt-9 ${className}`}
+      preserveAspectRatio="none"
+      className={`pointer-events-none absolute inset-0 h-full w-full ${className}`}
     >
       <path
         d="M 24,4
@@ -18,8 +23,8 @@ export default function NotchBorder({ className = "" }: { className?: string }) 
            Q 4,4 24,4
            Z"
         fill="white"
-        stroke="#60211a"
-        strokeWidth="2"
+        stroke="#e7e0d8"
+        strokeWidth="1.5"
         vectorEffect="non-scaling-stroke"
       />
     </svg>

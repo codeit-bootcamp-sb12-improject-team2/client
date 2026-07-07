@@ -10,6 +10,8 @@ interface ModalLayoutProps {
   width?: string;
   noPadding?: boolean;
   disableClose?: boolean;
+  panelClassName?: string;
+  scrollable?: boolean;
 }
 
 export default function ModalLayout({
@@ -19,6 +21,8 @@ export default function ModalLayout({
   width = "w-[502px]",
   noPadding = false,
   disableClose = false,
+  panelClassName = "",
+  scrollable = true,
 }: ModalLayoutProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +52,7 @@ export default function ModalLayout({
     >
       <div
         ref={modalRef}
-        className={`${width} max-h-[90vh] overflow-y-auto h-auto rounded-2xl ${noPadding ? "" : "p-8"} gap-2.5 bg-white relative`}
+        className={`${width} max-h-[90vh] ${scrollable ? "overflow-y-auto" : "overflow-visible"} h-auto rounded-2xl ${noPadding ? "" : "p-8"} gap-2.5 bg-[#fbfaf6] relative ${panelClassName}`}
         onClick={(e) => e.stopPropagation()}
       >
         <button

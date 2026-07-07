@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import ModalLayout from "@/shared/components/modal/ModalLayout";
-import Input from "@/shared/components/Input";
+import DateRangePicker from "@/shared/components/DateRangePicker";
 import Button from "@/shared/components/button/Button";
 import type { RestoreArticlesParams } from "@/api/articles/types";
 
 interface ArticleModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: RestoreArticlesParams) => void;
+  onSave: (data: RestoreArticlesParams) => void | Promise<void>;
 }
 
 export default function ArticleModal({
@@ -27,11 +27,11 @@ export default function ArticleModal({
     }
   }, [isOpen]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (isFormValid) {
-      onSave({
+      await onSave({
         from: fromDate,
         to: toDate,
       });
@@ -40,24 +40,32 @@ export default function ArticleModal({
   };
 
   return (
-    <ModalLayout isOpen={isOpen} onClose={onClose}>
-      <form onSubmit={handleSubmit} className="w-[438px] h-auto gap-10">
-        <h2 className="text-24-sb mb-10">기사 복구하기</h2>
-        <Input
-          label="날짜"
-          value={fromDate}
-          placeholder="2025.01.01 부터"
-          onChange={(e) => setFromDate(e.target.value)}
-          className="mb-2"
-        />
-        <Input
-          value={toDate}
-          placeholder="2025.01.01 까지"
-          onChange={(e) => setToDate(e.target.value)}
-          className="mb-12"
+    <ModalLayout
+      isOpen={isOpen}
+      onClose={onClose}
+      width="w-[560px]"
+      panelClassName="overflow-visible flex flex-col"
+      scrollable={false}
+    >
+      <form onSubmit={handleSubmit} className="flex w-full flex-col gap-6">
+        <h2 className="text-24-sb">기사 복구</h2>
+
+        <DateRangePicker
+          title="날짜"
+          fromValue={fromDate}
+          toValue={toDate}
+          onFromChange={setFromDate}
+          onToChange={setToDate}
+          className="relative w-full"
+          compact
         />
 
-        <Button className="w-full" disabled={!isFormValid} type="submit">
+        <Button
+          size="sm"
+          className="w-fit self-end px-5"
+          disabled={!isFormValid}
+          type="submit"
+        >
           복구하기
         </Button>
       </form>

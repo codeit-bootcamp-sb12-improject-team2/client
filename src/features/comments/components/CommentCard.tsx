@@ -75,17 +75,17 @@ export default function CommentCard({
 
   return (
     <div
-      className={`w-full h-auto border-gray-300 py-4 px-4 bg-gray-100 rounded-lg ${className || ""}`}
+      className={`w-full h-auto bg-transparent px-0 py-4 ${className || ""}`}
     >
       <div className="flex justify-between pr-1 gap-2 mb-2.5">
         <div className="gap-1 flex items-center">
-          <span className="text-14-m text-gray-500">{userNickname}</span>
-          <span className="text-14-m text-gray-500 ">·</span>
+          <span className="text-14-m text-gray-600">{userNickname}</span>
+          <span className="text-14-m text-gray-500">·</span>
           <span className="text-14-m text-gray-500">
             {formatDistanceToNow(createdAt, { addSuffix: true, locale: ko })}
           </span>
           {isMyComment && (
-            <span className="ml-1 text-14-m text-cyan-500">내 댓글</span>
+            <span className="ml-1 text-14-m text-[#60211a]">내 댓글</span>
           )}
         </div>
 
@@ -147,7 +147,9 @@ export default function CommentCard({
         </div>
       ) : (
         <div>
-          <p className="text-16-r text-gray-700">{content}</p>
+          <p className="whitespace-pre-wrap break-words text-16-r leading-7 text-gray-700">
+            {content}
+          </p>
         </div>
       )}
     </div>

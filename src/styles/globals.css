@@ -23,7 +23,8 @@
       "Segoe UI Symbol",
       sans-serif;
     color: var(--color-gray-700);
-    background-color: var(--color-gray-50);
+    /* 전체 배경 색상 */
+    background-color: #f8f7f3;
   }
 
   button {

@@ -38,7 +38,7 @@ export default function ViewedArticleList() {
 
   return (
     <>
-      <ul className="flex flex-col gap-4 divide-y divide-gray-300">
+      <ul className="flex min-w-0 flex-col">
         {items.map((a) => {
           const article: ArticleListItem = {
             id: a.articleId,
@@ -56,6 +56,7 @@ export default function ViewedArticleList() {
             <li key={a.id}>
               <NewsCard
                 article={article}
+                compact={true}
                 onClick={() => handleNewsCardClick(article)}
               />
             </li>

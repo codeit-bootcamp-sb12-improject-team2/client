@@ -23,18 +23,29 @@ import Label from "@/shared/components/Label";
 import commentIcon from "@/assets/icons/comment.svg";
 import useConfirmModal from "@/shared/hooks/useConfirmModal";
 import ConfirmModal from "@/shared/components/modal/ConfirmModal";
-import { addArticleView, getArticle } from "@/api/articles";
+import { addArticleView, getArticle, getArticleSummary } from "@/api/articles";
+import { toastApiError } from "@/shared/utils/toastApiError";
 
 interface ArticleDetailModalProps {
   articleId: ArticleId;
   onClose: () => void;
 }
 
+const articleSummaryCache = new Map<
+  ArticleId,
+  { summary: string; keywords: string[] }
+>();
+
 export default function ArticleDetailModal({
   articleId,
   onClose,
 }: ArticleDetailModalProps) {
   const [article, setArticle] = useState<ArticleListItem | null>(null);
+  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  const [summaryText, setSummaryText] = useState("");
+  const [summaryKeywords, setSummaryKeywords] = useState<string[]>([]);
+  const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState("");
   const commentItems = ["등록순", "좋아요순"];
 
   const limit = 5;
@@ -183,6 +194,48 @@ export default function ArticleDetailModal({
     }
   };
 
+  const handleAiSummaryClick = () => {
+    if (!article) return;
+
+    setIsSummaryOpen(true);
+    const cachedSummary = articleSummaryCache.get(article.id);
+    if (cachedSummary) {
+      // 캐시가 있으면 바로 보여주고 API 호출은 생략
+      setIsSummaryLoading(false);
+      setSummaryError("");
+      setSummaryText(cachedSummary.summary);
+      setSummaryKeywords(cachedSummary.keywords);
+      return;
+    }
+
+    setIsSummaryLoading(true);
+    setSummaryError("");
+    setSummaryText("");
+    setSummaryKeywords([]);
+
+    getArticleSummary(article.id)
+      .then((response) => {
+        if (!response.summary.trim()) {
+          setSummaryError("AI 요약 응답이 비어 있습니다.");
+          return;
+        }
+
+        articleSummaryCache.set(article.id, {
+          summary: response.summary,
+          keywords: response.keywords ?? [],
+        });
+        setSummaryText(response.summary);
+        setSummaryKeywords(response.keywords ?? []);
+      })
+      .catch((error) => {
+        console.error(error);
+        setSummaryError("AI 요약을 불러오지 못했습니다.");
+      })
+      .finally(() => {
+        setIsSummaryLoading(false);
+      });
+  };
+
   const handleApplyFilters = (value: string) => {
     if (value === "등록순") {
       setOrderBy("createdAt");
@@ -236,6 +289,7 @@ export default function ArticleDetailModal({
       toast.success("댓글 작성 완료");
     } catch (error) {
       console.error(error);
+      toastApiError(error);
     }
   };
 
@@ -269,9 +323,9 @@ export default function ArticleDetailModal({
         onClose={handleCloseModal}
         width="w-[894px]"
         noPadding={true}
-        disableClose={isConfirmOpen}
+        disableClose={isConfirmOpen || isSummaryOpen}
       >
-        <div className="h-auto rounded-tr-3xl rounded-tl-3xl pt-10 px-10 pb-6 bg-white">
+        <div className="h-auto rounded-tr-3xl rounded-tl-3xl bg-[#fffefd] pt-10 px-10 pb-6">
           <div className="text-20-b text-gray-900 mb-2">
             <span dangerouslySetInnerHTML={{ __html: article.title }} />
           </div>
@@ -296,11 +350,7 @@ export default function ArticleDetailModal({
               </div>
             </div>
           </div>
-          <div className="text-18-r text-gray-500 mb-6">
-            <span dangerouslySetInnerHTML={{ __html: article.summary }} />
-          </div>
-
-          <div className="mt-4 mb-10 border-b-gray-200">
+          <div className="mb-6 flex items-center gap-2">
             <Button
               size="sm"
               className="w-[162px]"
@@ -309,10 +359,25 @@ export default function ArticleDetailModal({
             >
               전체 기사 보러가기 →
             </Button>
+            <button
+              type="button"
+              onClick={handleAiSummaryClick}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-cyan-600 transition hover:border-cyan-300 hover:bg-cyan-50"
+              aria-label="AI 요약"
+              title="AI 요약"
+            >
+              <span aria-hidden="true" className="text-[18px] leading-none">
+                ✦
+              </span>
+            </button>
+          </div>
+
+          <div className="text-18-r text-gray-500 mb-6">
+            <span dangerouslySetInnerHTML={{ __html: article.summary }} />
           </div>
         </div>
 
-        <div className="rounded-br-3xl rounded-bl-3xl pt-3 px-10 pb-8 bg-gray-100">
+        <div className="rounded-br-3xl rounded-bl-3xl bg-[#fcfbf8] pt-3 px-10 pb-8">
           <div className="mb-2 w-[110px]">
             <SelectBox
               items={commentItems}
@@ -324,18 +389,37 @@ export default function ArticleDetailModal({
               noBackground={true}
             />
           </div>
-          <div className="flex items-center gap-2.5 mb-2">
+          <div className="mb-2 flex items-center gap-3">
             <Input
-              placeholder="2025.01.01 부터"
+              placeholder="댓글을 입력하세요"
               className="flex-1"
               value={writtenComment}
               onChange={(e) => setWrittenComment(e.target.value)}
             />
+            {/* 댓글 작성 아이콘 색상: 입력 전 중립 / 입력 후 Deep Wine */}
             <Button
-              className="w-[92px]"
+              type="button"
+              variant={writtenComment.trim() ? "primary" : "tertiary"}
+              aria-label="댓글 작성"
+              title="댓글 작성"
+              disabled={!writtenComment.trim()}
+              className="h-[52px] w-[52px] shrink-0 rounded-full p-0"
               onClick={() => handleAddComment(writtenComment)}
             >
-              댓글 작성
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5 12H18M12 5L19 12L12 19"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </Button>
           </div>
           <div>
@@ -361,6 +445,62 @@ export default function ArticleDetailModal({
           </div>
         </div>
       </ModalLayout>
+
+      {isSummaryOpen && article && (
+        <ModalLayout
+          isOpen={isSummaryOpen}
+          onClose={() => setIsSummaryOpen(false)}
+          width="w-[560px]"
+          noPadding={true}
+          scrollable={false}
+          panelClassName="px-8 pt-8 pb-6"
+        >
+          <div className="mb-6 flex items-center gap-2">
+            <span className="text-20-b text-gray-900">AI 요약</span>
+            <span className="rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-12-b text-amber-700">
+              AI
+            </span>
+          </div>
+
+          <div className="mb-4 rounded-2xl border border-[#e8e2d8] bg-[#fbfaf6] px-5 py-4">
+            <div className="mb-2 text-16-b text-gray-900">
+              <span dangerouslySetInnerHTML={{ __html: article.title }} />
+            </div>
+            {isSummaryLoading ? (
+              <div className="text-16-r leading-7 text-gray-600">
+                요약을 불러오는 중입니다.
+              </div>
+            ) : summaryError ? (
+              <div className="text-16-r leading-7 text-gray-600">
+                {summaryError}
+              </div>
+            ) : (
+              <>
+                <div className="whitespace-pre-line text-16-r leading-7 text-gray-600">
+                  {summaryText}
+                </div>
+                {summaryKeywords.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {summaryKeywords.map((keyword) => (
+                      <span
+                        key={keyword}
+                        className="rounded-full bg-cyan-50 px-3 py-1 text-12-m text-cyan-700"
+                      >
+                        {keyword}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          <div className="text-13-r text-gray-400">
+            {summaryError || "AI 기사 1개를 바탕으로 생성되었습니다."}
+          </div>
+        </ModalLayout>
+      )}
+
       {confirmData && (
         <ConfirmModal
           isOpen={isConfirmOpen}

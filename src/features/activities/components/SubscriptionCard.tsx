@@ -16,10 +16,10 @@ export default function SubscriptionCard({
   const overflow = safe.length > visible.length;
 
   return (
-    <div className="flex flex-col w-[212px] gap-3 my-5 max-h-[168px] bg-tranparent">
-      <p className="text-16-sb text-black">{name}</p>
+    <div className="flex w-full flex-col gap-3 py-5">
+      <p className="text-16-sb text-slate-950">{name}</p>
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2">
         {visible.map((k) => (
           <Tag key={k} label={k} />
         ))}

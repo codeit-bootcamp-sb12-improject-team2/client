@@ -26,16 +26,16 @@ export default function ActivitiesPage() {
   }, [isValid, setSp]);
 
   return (
-    <div className="flex justify-center gap-10 w-full">
+    <div className="mx-auto grid w-full max-w-[1300px] grid-cols-[260px_minmax(0,1fr)] gap-10">
       <div className="flex flex-col gap-4">
         <ProfileCard />
         <SubscriptionPanel />
       </div>
 
       {/* tabs : 최근 작성한 댓글 / 좋아요한 댓글 / 최근 본 기사 */}
-      <div className="flex flex-col">
+      <div className="min-w-0 flex flex-col">
         <ActivitiesTabs />
-        <div className="mt-2 flex flex-col gap-4 h-full">
+        <div className="mt-2 flex min-w-0 flex-col gap-4 h-full">
           {tab === "recent" && <RecentCommentList />}
           {tab === "liked" && <LikedCommentList />}
           {tab === "viewed" && <ViewedArticleList />}

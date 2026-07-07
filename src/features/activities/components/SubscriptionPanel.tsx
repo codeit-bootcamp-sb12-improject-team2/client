@@ -25,12 +25,11 @@ export default function SubscriptionPanel() {
   return (
     <aside
       aria-labelledby="subs-heading"
-      className="w-[260px] min-h-0 rounded-2xl p-6 bg-white border border-gray-200"
+      className="w-[260px] min-h-0 rounded-2xl border border-[#e8e2d8] bg-white p-6"
     >
-      {/* Header */}
-      <div className="flex justify-between items-center w-full">
-        <h2 id="subs-heading" className="text-18-b text-gray-900">
-          총<span className="text-cyan-600">{totalCount}개</span>의 관심사
+      <div className="flex w-full items-center justify-between">
+        <h2 id="subs-heading" className="text-18-b text-slate-950">
+          총 <span className="text-[#60211a]">{totalCount}개</span>의 관심사
           구독중
         </h2>
         <Link to={ROUTES.INTERESTS} aria-label="interests">
@@ -38,10 +37,10 @@ export default function SubscriptionPanel() {
         </Link>
       </div>
 
-      {!empty && <div className="mt-6 h-[1px] w-[212px] bg-gray-200" />}
+      {!empty && <div className="mt-6 h-px w-full bg-[#e8e2d8]" />}
 
       {!empty && (
-        <ul className="flex flex-col divide-y divide-gray-200">
+        <ul className="flex flex-col">
           {items.map((s) => (
             <li key={s.interestId}>
               <SubscriptionCard
