@@ -17,8 +17,8 @@ export default function LandingPage() {
         <p className="lg:text-[30px] md:text-[24px] text-[20px]">
           마음대로 골라 보는 모든 뉴스
         </p>
-        <h1 className="lg:text-[36px] md:text-[30px] text-[24px] font-bold text-cyan-500">
-          모뉴
+        <h1 className="lg:text-[36px] md:text-[30px] text-[24px] font-bold text-[#4a3d25]">
+          MONEW
         </h1>
       </div>
 
@@ -27,22 +27,22 @@ export default function LandingPage() {
           imageSrc={firstImageUrl}
           imageAlt="관심사 목록"
           description="관심사를 등록해보세요"
-          containerClassName="bg-white border-cyan-400"
-          descriptionClassName="text-cyan-500"
+          containerClassName="bg-[#C7C1B1] border-[#C7C1B1]"
+          descriptionClassName="text-[#60211a]"
         />
         <LandingBox
           imageSrc={secondImageUrl}
           imageAlt="알림 목록"
           description="키워드에 맞는 뉴스가 수집돼요"
-          containerClassName="bg-gray-400 border-gray-200"
-          descriptionClassName="text-white"
+          containerClassName="bg-[#948869] border-[#948869]"
+          descriptionClassName="text-[#60211a]"
         />
         <LandingBox
           imageSrc={thirdImageUrl}
           imageAlt="댓글 목록"
           description="뉴스를 읽고 의견을 남겨보세요"
-          containerClassName="bg-gray-500 border-gray-300"
-          descriptionClassName="text-white"
+          containerClassName="bg-[#605331] border-[#605331]"
+          descriptionClassName="text-[#60211a]"
         />
       </div>
 

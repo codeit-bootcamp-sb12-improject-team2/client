@@ -81,22 +81,24 @@ export default function InterestCard({
           dropdownRef={dropdownRef}
         />
 
-        <div className="flex flex-1 flex-col pt-9">
+        <div className="flex min-h-0 flex-1 flex-col pt-4">
           <span className="text-14-sb text-gray-400">관심사</span>
-          <h2 className="mt-3 mb-6 text-24-b text-gray-900">{name}</h2>
+          <h2 className="mt-2 mb-2 text-24-b text-gray-900">{name}</h2>
 
-          <div className="mb-6 flex flex-1 flex-wrap content-start gap-3">
-            {keywords.map((keyword, index) => (
-              <div
-                key={index}
-                className="h-fit rounded-lg bg-gray-100 px-3 py-1.5 text-14-m text-gray-500"
-              >
-                {keyword}
-              </div>
-            ))}
+          <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="flex flex-wrap gap-3">
+              {keywords.map((keyword, index) => (
+                <div
+                  key={index}
+                  className="h-fit rounded-lg bg-gray-100 px-3 py-1.5 text-14-m text-gray-500"
+                >
+                  {keyword}
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="absolute right-8 bottom-8 flex justify-end">
+          <div className="mt-2 flex shrink-0 justify-end">
             {isSubscribed ? (
               <Button
                 variant="secondary"

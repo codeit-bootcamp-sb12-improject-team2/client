@@ -29,7 +29,12 @@ export default function LandingBox({
         className="w-full md:max-w-[370px] max-w-[320px] h-[265px] object-contain select-none"
         draggable={false}
       />
-      <p className={["text-18-m", descriptionClassName ?? ""].join(" ")}>
+      <p
+        className={[
+          "rounded-full bg-[#fffdf8]/85 px-5 py-2 text-18-m",
+          descriptionClassName ?? "",
+        ].join(" ")}
+      >
         {description}
       </p>
     </section>

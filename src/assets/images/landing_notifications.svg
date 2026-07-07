@@ -3,7 +3,7 @@
   <defs>
     <style>
       .cls-1 {
-        fill: #d0d4da;
+        fill: #d8ccb3;
       }
 
       .cls-2 {
@@ -15,7 +15,7 @@
       }
 
       .cls-3, .cls-4, .cls-5 {
-        fill: #fff;
+        fill: #fcfbf8;
       }
 
       .cls-6 {
@@ -39,7 +39,7 @@
       }
 
       .cls-9 {
-        fill: #1ab1c7;
+        fill: #60211a;
       }
 
       .cls-10, .cls-11 {
@@ -47,7 +47,7 @@
       }
 
       .cls-11 {
-        stroke: #e5e6ea;
+        stroke: #e8e2d8;
       }
 
       .cls-12 {
@@ -55,7 +55,7 @@
       }
 
       .cls-13 {
-        fill: #1396a8;
+        fill: #605331;
       }
     </style>
     <filter id="drop-shadow-1" filterUnits="userSpaceOnUse">

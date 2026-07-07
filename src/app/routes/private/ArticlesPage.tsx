@@ -213,22 +213,18 @@ export default function ArticlesPage() {
 
   const buildPaginationItems = useCallback(
     (currentPage: number, pageCount: number) => {
-      // 페이지 링크는 최대 11개만 보여주고 가운데 구간은 말줄임표
-      if (pageCount <= 11) {
+      if (pageCount <= 7) {
         return Array.from({ length: pageCount }, (_, index) => index + 1);
       }
 
-      if (currentPage <= 5) {
-        return [1, 2, 3, 4, 5, 6, 7, 8, "ellipsis", pageCount];
+      if (currentPage <= 4) {
+        return [1, 2, 3, 4, 5, "ellipsis", pageCount];
       }
 
-      if (currentPage >= pageCount - 4) {
+      if (currentPage >= pageCount - 3) {
         return [
           1,
           "ellipsis",
-          pageCount - 7,
-          pageCount - 6,
-          pageCount - 5,
           pageCount - 4,
           pageCount - 3,
           pageCount - 2,
@@ -240,11 +236,9 @@ export default function ArticlesPage() {
       return [
         1,
         "ellipsis",
-        currentPage - 2,
         currentPage - 1,
         currentPage,
         currentPage + 1,
-        currentPage + 2,
         "ellipsis",
         pageCount,
       ];
@@ -691,39 +685,15 @@ export default function ArticlesPage() {
     }
   };
 
-  const paginationItems = useMemo(
-    () => buildPaginationItems(pageIndex + 1, totalPages),
-    [buildPaginationItems, pageIndex, totalPages],
+  const reachablePageCount = Math.min(
+    totalPages,
+    pageHistory.length + (hasNext ? 1 : 0),
   );
 
-  const rankingDisplayItems = useMemo(() => {
-    const safeRankingItems = rankingItems || [];
-    if (safeRankingItems.length > 0) {
-      return safeRankingItems;
-    }
-
-    const safeArticles = articles || [];
-    return [...safeArticles]
-      .sort((a, b) =>
-        rankingType === "VIEW"
-          ? b.viewCount - a.viewCount
-          : b.commentCount - a.commentCount,
-      )
-      .slice(0, 3)
-      .map((article, index) => ({
-        rank: index + 1,
-        articleId: article.id,
-        title: article.title,
-        source: article.source,
-        viewCount: article.viewCount,
-        commentCount: article.commentCount,
-        rankingCount:
-          rankingType === "VIEW" ? article.viewCount : article.commentCount,
-        publishDate: article.publishDate,
-      }));
-  }, [articles, rankingItems, rankingType]);
-
-  const rankingDisplayDate = rankingDate || format(today, "yyyy-MM-dd");
+  const paginationItems = useMemo(
+    () => buildPaginationItems(pageIndex + 1, reachablePageCount),
+    [buildPaginationItems, pageIndex, reachablePageCount],
+  );
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-[#f8f7f3]">
@@ -798,11 +768,11 @@ export default function ArticlesPage() {
           <aside className="h-fit space-y-4 xl:sticky xl:top-4">
             <ArticleRankingPanel
               title="일간 랭킹"
-              rankingDate={rankingDisplayDate}
+              rankingDate={rankingDate}
               type={rankingType}
               activeType={rankingType}
               onTypeChange={setRankingType}
-              items={rankingDisplayItems}
+              items={rankingItems}
               onItemClick={handleRankingItemClick}
             />
           </aside>
