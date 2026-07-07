@@ -1,6 +1,3 @@
-import chevronLeft from "@/assets/icons/chevron-left.svg";
-import chevronRight from "@/assets/icons/chevron-right.svg";
-
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -16,6 +13,36 @@ export default function Pagination({
 }: PaginationProps) {
   if (totalPages <= 1) return null;
 
+  const pageNumbers =
+    totalPages <= 11
+      ? Array.from({ length: totalPages }, (_, i) => i + 1)
+      : currentPage <= 5
+        ? [1, 2, 3, 4, 5, 6, 7, 8, "ellipsis", totalPages]
+        : currentPage >= totalPages - 4
+          ? [
+              1,
+              "ellipsis",
+              totalPages - 7,
+              totalPages - 6,
+              totalPages - 5,
+              totalPages - 4,
+              totalPages - 3,
+              totalPages - 2,
+              totalPages - 1,
+              totalPages,
+            ]
+          : [
+              1,
+              "ellipsis",
+              currentPage - 2,
+              currentPage - 1,
+              currentPage,
+              currentPage + 1,
+              currentPage + 2,
+              "ellipsis",
+              totalPages,
+            ];
+
   const handlePrev = () => {
     if (currentPage > 1) onPageChange(currentPage - 1);
   };
@@ -24,42 +51,61 @@ export default function Pagination({
     if (currentPage < totalPages) onPageChange(currentPage + 1);
   };
 
-  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
-
   return (
-    <div className={`flex items-center justify-center gap-2 ${className}`}>
+    <nav
+      aria-label="페이지 이동"
+      className={`flex items-center justify-center gap-4 text-16-m ${className}`}
+    >
       <button
         type="button"
         onClick={handlePrev}
         disabled={currentPage === 1}
-        className="w-8 h-8 flex items-center justify-center rounded-lg disabled:opacity-30 hover:bg-gray-50"
+        className="inline-flex items-center gap-1 text-gray-500 transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:text-gray-300"
       >
-        <img src={chevronLeft} className="w-4 h-4" alt="이전" />
+        <span>이전</span>
+        <span aria-hidden="true">‹</span>
       </button>
 
-      {pageNumbers.map((page) => (
-        <button
-          key={page}
-          type="button"
-          onClick={() => onPageChange(page)}
-          className={`w-8 h-8 flex items-center justify-center rounded-lg text-14-m ${
-            page === currentPage
-              ? "bg-indigo-900 text-white"
-              : "text-gray-600 hover:bg-gray-50"
-          }`}
-        >
-          {page}
-        </button>
-      ))}
+      <div className="flex items-center gap-3">
+        {pageNumbers.map((page, index) =>
+          page === "ellipsis" ? (
+            <span
+              key={`ellipsis-${index}`}
+              className="inline-flex h-10 min-w-10 items-center justify-center px-1 text-gray-400"
+              aria-hidden="true"
+            >
+              …
+            </span>
+          ) : (
+            <button
+              key={page}
+              type="button"
+              onClick={() => onPageChange(page)}
+              aria-current={page === currentPage ? "page" : undefined}
+              className={`inline-flex h-10 min-w-10 items-center justify-center px-2 transition-colors ${
+                page === currentPage
+                  ? "border-b-2 border-slate-900 font-semibold text-slate-900"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              {page === currentPage && (
+                <span className="sr-only">현재페이지 </span>
+              )}
+              {page}
+            </button>
+          ),
+        )}
+      </div>
 
       <button
         type="button"
         onClick={handleNext}
         disabled={currentPage === totalPages}
-        className="w-8 h-8 flex items-center justify-center rounded-lg disabled:opacity-30 hover:bg-gray-50"
+        className="inline-flex items-center gap-1 text-gray-500 transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:text-gray-300"
       >
-        <img src={chevronRight} className="w-4 h-4" alt="다음" />
+        <span aria-hidden="true">›</span>
+        <span>다음</span>
       </button>
-    </div>
+    </nav>
   );
 }

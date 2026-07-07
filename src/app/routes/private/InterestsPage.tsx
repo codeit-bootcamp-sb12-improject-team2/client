@@ -51,7 +51,7 @@ export default function InterestsPage() {
 
   const [isLoading, setIsLoading] = useState(false);
 
- const [cursorStack, setCursorStack] = useState<
+  const [cursorStack, setCursorStack] = useState<
     { cursor: string | null; after: string | null }[]
   >([]);
 
@@ -79,7 +79,10 @@ export default function InterestsPage() {
   const { isOpen, openModal, onClose } = useUpdateModal();
 
   const fetchPage = useCallback(
-    async (page: number, stack: { cursor: string | null; after: string | null }[]) => {
+    async (
+      page: number,
+      stack: { cursor: string | null; after: string | null }[],
+    ) => {
       if (!userId) return;
 
       setIsLoading(true);
@@ -97,7 +100,12 @@ export default function InterestsPage() {
         };
 
         const response = await getInterests(params, userId);
-        console.log("API returned:", response.content.length, "items, size was:", params.size);
+        console.log(
+          "API returned:",
+          response.content.length,
+          "items, size was:",
+          params.size,
+        );
         setInterests(response.content);
         setCurrentPage(page);
 
@@ -129,7 +137,6 @@ export default function InterestsPage() {
     setSortOrder(direction === "DESC" ? "내림차순" : "오름차순");
     setCursorStack([]);
     fetchPage(1, []);
-    
   }, [keyword, orderBy, direction, userId]);
 
   const handlePageChange = (page: number) => {
@@ -290,7 +297,7 @@ export default function InterestsPage() {
             onSearch={handleSearch}
           />
         </div>
-        <div className="mt-0 min-w-2xs">
+        <div className="mt-8 min-w-2xs">
           {interests.length === 0 && !isLoading ? (
             <div className="flex justify-center items-center min-h-[200px] mt-30">
               {keyword ? (
@@ -301,7 +308,7 @@ export default function InterestsPage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-3 gap-6">
+              <div className="mx-14 grid grid-cols-3 gap-6">
                 {interests.map((interest) => (
                   <div className="w-full h-[320px]" key={interest.id}>
                     <InterestCard

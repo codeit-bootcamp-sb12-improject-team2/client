@@ -69,10 +69,10 @@ export default function InterestCard({
   };
 
   return (
-    <div className="relative w-90 h-[300px]">
+    <div className="relative h-full w-full">
       <NotchBorder />
 
-      <div className="relative z-10 flex flex-col h-full p-16">
+      <div className="relative z-10 flex h-full flex-col px-8 py-7">
         <InterestCardHeader
           subscriberCount={subscriberCount}
           isDropdownOpen={isDropdownOpen}
@@ -81,27 +81,27 @@ export default function InterestCard({
           dropdownRef={dropdownRef}
         />
 
-        <div className="flex-1 flex flex-col p-4">
-          <span className="text-12-r text-gray-400">관심사</span>
-          <h2 className="text-20-b text-gray-900 mt-3 mb-4">{name}</h2>
+        <div className="flex flex-1 flex-col pt-9">
+          <span className="text-14-sb text-gray-400">관심사</span>
+          <h2 className="mt-3 mb-6 text-24-b text-gray-900">{name}</h2>
 
-          <div className="flex flex-wrap gap-2 mb-4 flex-1">
+          <div className="mb-6 flex flex-1 flex-wrap content-start gap-3">
             {keywords.map((keyword, index) => (
               <div
                 key={index}
-                className="rounded-lg py-1 px-2 bg-gray-100 text-15-m text-gray-500 h-fit"
+                className="h-fit rounded-lg bg-gray-100 px-3 py-1.5 text-14-m text-gray-500"
               >
                 {keyword}
               </div>
             ))}
           </div>
 
-          <div className="mt-auto flex justify-end">
+          <div className="absolute right-8 bottom-8 flex justify-end">
             {isSubscribed ? (
               <Button
                 variant="secondary"
                 size="sm"
-                className="flex gap-1 min-w-[91px]"
+                className="min-w-[88px] gap-1 px-4"
                 onClick={handleSubscribeClick}
               >
                 <img src={checkIcon} className="w-4 h-4" alt="체크" />
@@ -109,7 +109,7 @@ export default function InterestCard({
               </Button>
             ) : (
               <Button
-                className="min-w-[91px]"
+                className="min-w-[88px] px-4 !transition-none hover:!bg-[#60211a]"
                 size="sm"
                 onClick={handleSubscribeClick}
               >
