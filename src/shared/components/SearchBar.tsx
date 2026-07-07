@@ -24,10 +24,6 @@ export default function SearchBar({
 
     if (onSearch && value.trim()) {
       onSearch(value.trim());
-
-      if (inputRef.current) {
-        inputRef.current.value = "";
-      }
     }
   };
 
@@ -43,7 +39,7 @@ export default function SearchBar({
 
   return (
     <div
-      className={`${width} ${height} px-4 py-2.5 border bg-white border-gray-300 rounded-[100px] flex items-center justify-between gap-2.5 ${containerClassName}`}
+      className={`${width} ${height} flex items-center justify-between gap-2.5 rounded-[100px] border border-[#dcd5c8] bg-white px-4 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.02)] ${containerClassName}`}
     >
       <input
         ref={inputRef}

@@ -17,7 +17,7 @@ export default function Dropdown({
 
   return (
     <div
-      className={`absolute box-border bg-white border border-gray-200 rounded-lg overflow-hidden ${className}`}
+      className={`absolute z-50 box-border bg-white border border-gray-200 rounded-lg overflow-hidden ${className}`}
     >
       <ul className={`py-1 max-h-60 overflow-y-auto cursor-pointer`}>
         {items.map((item, index) => (

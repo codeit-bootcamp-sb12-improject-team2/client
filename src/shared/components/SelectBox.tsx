@@ -55,7 +55,7 @@ export default function SelectBox({
     <div ref={selectRef} className={`relative ${className}`}>
       <button
         type="button"
-        className={`${noBorder ? "" : "border rounded-lg border-gray-200"} ${noBackground ? "" : "bg-white"} py-2.5 px-3 cursor-pointer w-full h-full focus:outline-none`}
+        className={`${noBorder ? "" : "border rounded-lg border-[#ded8cb]"} ${noBackground ? "" : "bg-white"} py-2.5 px-3 cursor-pointer w-full h-full focus:outline-none`}
         onClick={handleSelectBarClick}
       >
         <div className="flex justify-between items-center">
