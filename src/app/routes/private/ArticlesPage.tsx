@@ -696,35 +696,6 @@ export default function ArticlesPage() {
     [buildPaginationItems, pageIndex, reachablePageCount],
   );
 
-  const rankingDisplayItems = useMemo(() => {
-    const safeRankingItems = rankingItems || [];
-    if (safeRankingItems.length > 0) {
-      return safeRankingItems;
-    }
-
-    const safeArticles = articles || [];
-    return [...safeArticles]
-      .sort((a, b) =>
-        rankingType === "VIEW"
-          ? b.viewCount - a.viewCount
-          : b.commentCount - a.commentCount,
-      )
-      .slice(0, 3)
-      .map((article, index) => ({
-        rank: index + 1,
-        articleId: article.id,
-        title: article.title,
-        source: article.source,
-        viewCount: article.viewCount,
-        commentCount: article.commentCount,
-        rankingCount:
-          rankingType === "VIEW" ? article.viewCount : article.commentCount,
-        publishDate: article.publishDate,
-      }));
-  }, [articles, rankingItems, rankingType]);
-
-  const rankingDisplayDate = rankingDate || format(today, "yyyy-MM-dd");
-
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-[#f8f7f3]">
       <div className="mx-auto w-full max-w-[1500px] px-4 pb-10 pt-10 sm:px-6 lg:px-8">
@@ -798,11 +769,11 @@ export default function ArticlesPage() {
           <aside className="h-fit space-y-4 xl:sticky xl:top-4">
             <ArticleRankingPanel
               title="일간 랭킹"
-              rankingDate={rankingDisplayDate}
+              rankingDate={rankingDate}
               type={rankingType}
               activeType={rankingType}
               onTypeChange={setRankingType}
-              items={rankingDisplayItems}
+              items={rankingItems}
               onItemClick={handleRankingItemClick}
             />
           </aside>
