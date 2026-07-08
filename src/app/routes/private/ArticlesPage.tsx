@@ -280,16 +280,23 @@ export default function ArticlesPage() {
     }
   }, [sourceInParam]);
 
-  const fetchDailyRankings = useCallback(async (type: RankingType) => {
-    try {
-      // 조회수/댓글수 랭킹은 같은 API에서 타입만 바꿔 가져옴
-      const response = await getArticleRanking(type);
-      setRankingItems(response?.articles || []);
-      setRankingDate(response?.date || "");
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
+  const fetchDailyRankings = useCallback(
+    async (type: RankingType) => {
+      if (!userId) return;
+
+      try {
+        // 조회수/댓글수 랭킹은 같은 API에서 타입만 바꿔 가져옴
+        const response = await getArticleRanking(type, userId);
+        setRankingItems(response?.articles || []);
+        setRankingDate(response?.date || "");
+      } catch (error) {
+        console.error(error);
+        setRankingItems([]);
+        setRankingDate("");
+      }
+    },
+    [userId],
+  );
 
   useEffect(() => {
     fetchArticleSources();
