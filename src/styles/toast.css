@@ -10,14 +10,19 @@
   word-break: keep-all;
   border-radius: 8px;
   padding: 12px 24px !important;
-  background-color: rgba(0, 0, 0, 0.5) !important;
-  color: white;
+  border: 1px solid #e8e2d8;
+  background-color: #fffdf8 !important;
+  color: #1f2937;
   font-size: 16px;
   font-weight: 500;
 }
 
 .Toastify__toast-body {
-  color: white;
+  color: #1f2937 !important;
+}
+
+.Toastify__toast-body * {
+  color: #1f2937 !important;
 }
 
 :root {
