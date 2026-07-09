@@ -2,12 +2,12 @@ import type { NotificationId, UserId, UUID } from "@/types/ids";
 
 export type NotificationsItem = {
   id: NotificationId;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string | null;
+  updatedAt: string | null;
   confirmed: boolean;
   userId: UserId;
   content: string;
-  resourceType: "interest" | "comment";
+  resourceType: "INTEREST" | "COMMENT" | "interest" | "comment";
   resourceId: UUID;
 };
 

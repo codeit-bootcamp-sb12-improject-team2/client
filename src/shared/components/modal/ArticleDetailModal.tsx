@@ -79,7 +79,17 @@ export default function ArticleDetailModal({
       getArticle(articleId, userId).then((res) => {
         setArticle(res);
         if (!res.viewedByMe) {
-          addArticleView(articleId, userId);
+          addArticleView(articleId, userId).then((view) => {
+            setArticle((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    viewedByMe: true,
+                    viewCount: view.articleViewCount,
+                  }
+                : prev,
+            );
+          });
         }
       });
     }
@@ -294,6 +304,15 @@ export default function ArticleDetailModal({
     }
   };
 
+  const handleCommentKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (event.key !== "Enter" || event.nativeEvent.isComposing) return;
+
+    event.preventDefault();
+    handleAddComment(writtenComment);
+  };
+
   const handleDeleteComment = async (commentId: CommentId) => {
     openConfirmModal({
       title: "댓글 삭제",
@@ -395,6 +414,7 @@ export default function ArticleDetailModal({
               className="flex-1"
               value={writtenComment}
               onChange={(e) => setWrittenComment(e.target.value)}
+              onKeyDown={handleCommentKeyDown}
             />
             {/* 댓글 작성 아이콘 색상: 입력 전 중립 / 입력 후 Deep Wine */}
             <Button

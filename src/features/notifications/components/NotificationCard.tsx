@@ -13,7 +13,7 @@ export default function NotificationCard({
   item,
   onConfirm,
 }: NotificationCardProps) {
-  const timeText = formatTimeAgo(item.createdAt);
+  const timeText = formatTimeAgo(item.createdAt ?? item.updatedAt);
 
   return (
     <article

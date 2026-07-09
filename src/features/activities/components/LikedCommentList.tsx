@@ -3,8 +3,14 @@ import type { ActivityComment } from "@/api/user-activities/types";
 import CommentHistoryCard from "@/features/comments/components/CommentHistoryCard";
 import EmptyState from "@/shared/components/EmptyState";
 import Skeleton from "@/shared/components/Skeleton";
+import ArticleDetailModal from "@/shared/components/modal/ArticleDetailModal";
+import { useState } from "react";
+import type { ArticleId } from "@/types/ids";
 
 export default function LikedCommentList() {
+  const [selectedArticleId, setSelectedArticleId] = useState<ArticleId | null>(
+    null,
+  );
   const { items, error, loading, empty } = useUserActivitiesList(
     "likedComments",
     10,
@@ -25,25 +31,38 @@ export default function LikedCommentList() {
   }
 
   return (
-    <ul className="flex flex-col gap-4 divide-y divide-gray-300">
-      {items.map((c) => {
-        const normalized = {
-          id: c.commentId,
-          articleId: c.articleId,
-          articleTitle: c.articleTitle,
-          userId: c.commentUserId,
-          userNickname: c.commentUserNickname,
-          content: c.commentContent,
-          likeCount: c.commentLikeCount,
-          createdAt: c.commentCreatedAt,
-        } satisfies ActivityComment;
+    <>
+      <ul className="flex flex-col gap-4 divide-y divide-gray-300">
+        {items.map((c) => {
+          const normalized = {
+            id: c.commentId,
+            articleId: c.articleId,
+            articleTitle: c.articleTitle,
+            userId: c.commentUserId,
+            userNickname: c.commentUserNickname,
+            content: c.commentContent,
+            likeCount: c.commentLikeCount,
+            createdAt: c.commentCreatedAt,
+          } satisfies ActivityComment;
 
-        return (
-          <li key={c.id}>
-            <CommentHistoryCard mode="liked" isLiked={true} {...normalized} />
-          </li>
-        );
-      })}
-    </ul>
+          return (
+            <li key={c.id}>
+              <CommentHistoryCard
+                mode="liked"
+                isLiked={true}
+                onClick={() => setSelectedArticleId(c.articleId)}
+                {...normalized}
+              />
+            </li>
+          );
+        })}
+      </ul>
+      {selectedArticleId && (
+        <ArticleDetailModal
+          articleId={selectedArticleId}
+          onClose={() => setSelectedArticleId(null)}
+        />
+      )}
+    </>
   );
 }

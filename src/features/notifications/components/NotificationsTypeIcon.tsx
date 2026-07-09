@@ -11,7 +11,7 @@ export default function NotificationsTypeIcon({
   type,
   className,
 }: TypeIconProps) {
-  if (type === "comment") {
+  if (type.toLowerCase() === "comment") {
     return <img src={heartIconUrl} alt="" className={className} />;
   }
   return <img src={bellIconUrl} alt="" className={className} />;

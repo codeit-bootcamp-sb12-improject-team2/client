@@ -9,8 +9,9 @@ export default function NotificationContentText({
   item,
 }: NotificationContentTextProps) {
   const text = item.content;
+  const resourceType = item.resourceType.toLowerCase();
 
-  if (item.resourceType === "comment") {
+  if (resourceType === "comment") {
     const msg = /^(.+?)님이 나의 댓글을 좋아합니다\.$/.exec(text);
     if (msg) {
       const nickname = msg[1];
@@ -23,7 +24,7 @@ export default function NotificationContentText({
     }
   }
 
-  if (item.resourceType === "interest") {
+  if (resourceType === "interest") {
     const msg = /^(.+?)와 관련된 기사가 (\d+)건 등록되었습니다\.$/.exec(text);
     if (msg) {
       const keyword = msg[1];

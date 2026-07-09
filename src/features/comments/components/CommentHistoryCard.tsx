@@ -9,6 +9,7 @@ type CommentHistoryCardProps = ActivityComment & {
   mode?: "recent" | "liked";
   isLiked: boolean;
   onLikeClick?: (commentId: CommentId) => void;
+  onClick?: () => void;
 };
 
 export default function CommentHistoryCard({
@@ -20,13 +21,17 @@ export default function CommentHistoryCard({
   createdAt,
   isLiked,
   onLikeClick,
+  onClick,
 }: CommentHistoryCardProps) {
   const handleHeartClick = () => {
     onLikeClick?.(id);
   };
 
   return (
-    <div className="w-full max-w-[895px] h-auto px-2 py-8 bg-transparent border-none">
+    <div
+      className="w-full max-w-[895px] h-auto px-2 py-8 bg-transparent border-none cursor-pointer"
+      onClick={onClick}
+    >
       <div className="flex mb-4 items-center">
         <div className="flex">
           <p
@@ -54,7 +59,10 @@ export default function CommentHistoryCard({
           <span className="text-18-sb line-clamp-3">{content}</span>
         </div>
         <button
-          onClick={handleHeartClick}
+          onClick={(event) => {
+            event.stopPropagation();
+            handleHeartClick();
+          }}
           className="flex justify-center items-center gap-2 shrink-0"
         >
           {isLiked ? (
