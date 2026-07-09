@@ -3,8 +3,14 @@ import type { ActivityComment } from "@/api/user-activities/types";
 import CommentHistoryCard from "@/features/comments/components/CommentHistoryCard";
 import EmptyState from "@/shared/components/EmptyState";
 import Skeleton from "@/shared/components/Skeleton";
+import ArticleDetailModal from "@/shared/components/modal/ArticleDetailModal";
+import { useState } from "react";
+import type { ArticleId } from "@/types/ids";
 
 export default function RecentCommentList() {
+  const [selectedArticleId, setSelectedArticleId] = useState<ArticleId | null>(
+    null,
+  );
   const { items, error, loading, empty } = useUserActivitiesList(
     "recentComments",
     10,
@@ -25,25 +31,38 @@ export default function RecentCommentList() {
   }
 
   return (
-    <ul className="flex flex-col divide-y divide-gray-300">
-      {items.map((c) => {
-        const normalized = {
-          id: c.id,
-          articleId: c.articleId,
-          articleTitle: c.articleTitle,
-          userId: c.userId,
-          userNickname: c.userNickname,
-          content: c.content,
-          likeCount: c.likeCount,
-          createdAt: c.createdAt,
-        } satisfies ActivityComment;
+    <>
+      <ul className="flex flex-col divide-y divide-gray-300">
+        {items.map((c) => {
+          const normalized = {
+            id: c.id,
+            articleId: c.articleId,
+            articleTitle: c.articleTitle,
+            userId: c.userId,
+            userNickname: c.userNickname,
+            content: c.content,
+            likeCount: c.likeCount,
+            createdAt: c.createdAt,
+          } satisfies ActivityComment;
 
-        return (
-          <li key={c.id}>
-            <CommentHistoryCard mode="recent" isLiked={false} {...normalized} />
-          </li>
-        );
-      })}
-    </ul>
+          return (
+            <li key={c.id}>
+              <CommentHistoryCard
+                mode="recent"
+                isLiked={false}
+                onClick={() => setSelectedArticleId(c.articleId)}
+                {...normalized}
+              />
+            </li>
+          );
+        })}
+      </ul>
+      {selectedArticleId && (
+        <ArticleDetailModal
+          articleId={selectedArticleId}
+          onClose={() => setSelectedArticleId(null)}
+        />
+      )}
+    </>
   );
 }
