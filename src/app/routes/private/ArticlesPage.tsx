@@ -591,6 +591,19 @@ export default function ArticlesPage() {
 
   const handleViewArticle = useCallback(
     (article: ArticleListItem) => {
+      if (!article.viewedByMe) {
+        setArticles((prev) =>
+          prev.map((item) =>
+            item.id === article.id
+              ? {
+                  ...item,
+                  viewedByMe: true,
+                  viewCount: item.viewCount + 1,
+                }
+              : item,
+          ),
+        );
+      }
       detailOpenModal(article);
     },
     [detailOpenModal],
