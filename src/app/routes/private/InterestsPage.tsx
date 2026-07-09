@@ -40,12 +40,14 @@ interface ApiErrorResponse {
 }
 
 const PAGE_SIZE = 9;
+type SubscriptionFilter = "all" | "subscribed" | "unsubscribed";
 
 export default function InterestsPage() {
   const [interests, setInterests] = useState<InterestListItem[]>([]);
 
   const sortOptions = ["이름", "구독자수"];
   const orderOptions = ["내림차순", "오름차순"];
+  const subscriptionOptions = ["전체", "구독 중", "미구독"];
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -70,13 +72,30 @@ export default function InterestsPage() {
     directionParam === "ASC" || directionParam === "DESC"
       ? directionParam
       : "DESC";
+  const subscriptionParam = searchParams.get("subscription");
+  const subscriptionFilter: SubscriptionFilter =
+    subscriptionParam === "subscribed" || subscriptionParam === "unsubscribed"
+      ? subscriptionParam
+      : "all";
 
   const [sortBy, setSortBy] = useState("이름");
   const [sortOrder, setSortOrder] = useState("내림차순");
+  const [subscriptionValue, setSubscriptionValue] = useState("전체");
+  const [searchInput, setSearchInput] = useState(keyword);
 
   const { userId } = useAuthInfo();
 
   const { isOpen, openModal, onClose } = useUpdateModal();
+
+  const matchesSubscriptionFilter = useCallback(
+    (interest: InterestListItem) => {
+      if (subscriptionFilter === "subscribed") return interest.subscribedByMe;
+      if (subscriptionFilter === "unsubscribed")
+        return !interest.subscribedByMe;
+      return true;
+    },
+    [subscriptionFilter],
+  );
 
   const fetchPage = useCallback(
     async (
@@ -88,6 +107,31 @@ export default function InterestsPage() {
       setIsLoading(true);
 
       try {
+        if (subscriptionFilter !== "all") {
+          const countResponse = await getInterests(
+            { keyword, orderBy, direction, size: 1 },
+            userId,
+          );
+          const response = await getInterests(
+            {
+              keyword,
+              orderBy,
+              direction,
+              size: Math.max(countResponse.totalElements, PAGE_SIZE),
+            },
+            userId,
+          );
+          const filtered = response.content.filter(matchesSubscriptionFilter);
+
+          setInterests(
+            filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+          );
+          setCurrentPage(page);
+          setCursorStack([]);
+          setTotalPages(Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)));
+          return;
+        }
+
         const cursorForPage = page > 1 ? stack[page - 2] : undefined;
 
         const params = {
@@ -100,12 +144,6 @@ export default function InterestsPage() {
         };
 
         const response = await getInterests(params, userId);
-        console.log(
-          "API returned:",
-          response.content.length,
-          "items, size was:",
-          params.size,
-        );
         setInterests(response.content);
         setCurrentPage(page);
 
@@ -129,15 +167,29 @@ export default function InterestsPage() {
         setIsLoading(false);
       }
     },
-    [keyword, orderBy, direction, userId],
+    [
+      keyword,
+      orderBy,
+      direction,
+      userId,
+      subscriptionFilter,
+      matchesSubscriptionFilter,
+    ],
   );
 
   useEffect(() => {
     setSortBy(orderBy === "name" ? "이름" : "구독자수");
     setSortOrder(direction === "DESC" ? "내림차순" : "오름차순");
+    setSubscriptionValue(
+      subscriptionFilter === "subscribed"
+        ? "구독 중"
+        : subscriptionFilter === "unsubscribed"
+          ? "미구독"
+          : "전체",
+    );
     setCursorStack([]);
     fetchPage(1, []);
-  }, [keyword, orderBy, direction, userId]);
+  }, [keyword, orderBy, direction, subscriptionFilter, userId, fetchPage]);
 
   const handlePageChange = (page: number) => {
     if (page === currentPage) return;
@@ -156,19 +208,7 @@ export default function InterestsPage() {
       } else {
         await subscribeInterest(interestId, userId);
       }
-      setInterests((prev) =>
-        prev.map((interest) =>
-          interest.id === interestId
-            ? {
-                ...interest,
-                subscribedByMe: !currentSubscribed,
-                subscriberCount: currentSubscribed
-                  ? interest.subscriberCount - 1
-                  : interest.subscriberCount + 1,
-              }
-            : interest,
-        ),
-      );
+      await fetchPage(currentPage, cursorStack);
     } catch (error) {
       console.error(error);
       toast.error(currentSubscribed ? "구독 취소 실패" : "구독 실패");
@@ -223,17 +263,46 @@ export default function InterestsPage() {
   };
 
   const handleSearch = (searchKeyword: string) => {
-    if ((searchKeyword ?? "") === keyword) return;
+    const nextKeyword = searchKeyword.trim();
+
+    if (nextKeyword === keyword) return;
+
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
-      if (searchKeyword) {
-        newParams.set("keyword", searchKeyword);
+      if (nextKeyword) {
+        newParams.set("keyword", nextKeyword);
       } else {
         newParams.delete("keyword");
       }
       return newParams;
     });
   };
+
+  useEffect(() => {
+    setSearchInput(keyword);
+  }, [keyword]);
+
+  useEffect(() => {
+    const nextKeyword = searchInput.trim();
+
+    if (nextKeyword === keyword) return;
+
+    const timer = window.setTimeout(() => {
+      setSearchParams((prev) => {
+        const newParams = new URLSearchParams(prev);
+
+        if (nextKeyword) {
+          newParams.set("keyword", nextKeyword);
+        } else {
+          newParams.delete("keyword");
+        }
+
+        return newParams;
+      });
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [searchInput, keyword, setSearchParams]);
 
   const handleSortOptions = (value: string) => {
     const newSort = value === "이름" ? "name" : "subscriberCount";
@@ -249,6 +318,25 @@ export default function InterestsPage() {
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
       newParams.set("direction", newOrder);
+      return newParams;
+    });
+  };
+
+  const handleSubscriptionOptions = (value: string) => {
+    const nextFilter =
+      value === "구독 중"
+        ? "subscribed"
+        : value === "미구독"
+          ? "unsubscribed"
+          : "";
+
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      if (nextFilter) {
+        newParams.set("subscription", nextFilter);
+      } else {
+        newParams.delete("subscription");
+      }
       return newParams;
     });
   };
@@ -283,7 +371,7 @@ export default function InterestsPage() {
               items={sortOptions}
               value={sortBy}
               onChange={handleSortOptions}
-              className="w-17 h-10 ml-14"
+              className="w-25 h-10 ml-14"
             />
             <SelectBox
               items={orderOptions}
@@ -291,10 +379,18 @@ export default function InterestsPage() {
               onChange={handleOrderOptions}
               className="w-24 h-10"
             />
+            <SelectBox
+              items={subscriptionOptions}
+              value={subscriptionValue}
+              onChange={handleSubscriptionOptions}
+              className="w-24 h-10"
+            />
           </div>
           <SearchBar
             width="w-[250px] flex justify-center items-center mr-11.5"
             onSearch={handleSearch}
+            value={searchInput}
+            onChange={(event) => setSearchInput(event.target.value)}
           />
         </div>
         <div className="mt-8 min-w-2xs">

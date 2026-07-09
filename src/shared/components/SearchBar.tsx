@@ -22,7 +22,7 @@ export default function SearchBar({
   const handleSearchClick = () => {
     const value = inputRef.current?.value || "";
 
-    if (onSearch && value.trim()) {
+    if (onSearch) {
       onSearch(value.trim());
     }
   };
